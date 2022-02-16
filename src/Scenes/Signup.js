@@ -1,30 +1,53 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { app } from "../ConnectAuth";
 
-export default function Signup() {
-    const [email, setEmail] = useState (" ");
-    const [password, setPassword] = useState (" ");
-    const handleFormSubmit = (event) => {
-        event.preventDefault();
-        alert('trying to sign up as ${email}');
-    }
-    return ( 
+export default function Signup({ setUser }) {
+  const [email, setEmail] = useState(" ");
+  const [password, setPassword] = useState(" ");
+  const navigate = useNavigate();
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+    const auth = getAuth(app);
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((result) => {
+        //setUser
+        setUser(result.user);
+        //navigate to home
+        navigate("/");
+      })
+      .catch(alert);
+  };
+
+  return (
     <>
-    <h1>Signup</h1>
-    <hr />
-    <from>
-        <label>Email: <input type="email" />label>
-        <br />
-        <label>Password: <input type="password" />label>
-        <br />
+      <h2>Signup</h2>
+      <br />
+      <form onSubmit={handleFormSubmit}>
+        <label>
+          {" "}
+          Email:
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
-        <input type="password" value={password}
-            onChange={e => setPassword(e.target.value)}/>
+        <label>
+          {" "}
+          Password:
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </label>
-        <br />
         <input type="submit" value="Sign up" />
-    </from>
-    <p>Already a user? <Link to="/">Sign Up</Link></p>
+      </form>
+      <p>
+        Already a user? <Link to="login">Login</Link>
+      </p>
     </>
-    )
+  );
 }
